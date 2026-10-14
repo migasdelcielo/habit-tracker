@@ -2,6 +2,11 @@
 
 Un panel de control web minimalista y moderno para el seguimiento semanal de hábitos, metas diarias y rachas de consistencia.
 
+## 🌐 Demo en vivo
+
+Puedes usar la aplicación directamente desde:
+👉 **[https://migasdelcielo.github.io/habit-tracker/](https://migasdelcielo.github.io/habit-tracker/)**
+
 ## 🚀 Características
 
 - **Seguimiento Semanal:** Marca tus hábitos día a día de lunes a domingo.
