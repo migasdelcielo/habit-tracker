@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Habit Flow | Panel de Hábitos</title>
+  <style>
+    :root {
+      --bg-main: #0b0f19;
+      --bg-card: #151c2c;
+      --bg-card-hover: #1e293b;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --accent: #10b981;
+      --accent-glow: rgba(16, 185, 129, 0.25);
+      --accent-secondary: #6366f1;
+      --danger: #ef4444;
+      --border: #263147;
+      --radius: 14px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      padding: 2rem 1rem;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 1050px;
+      margin: 0 auto;
+      display: grid;
+      gap: 1.5rem;
+    }
+
+    /* Cabecera y Métricas Superiores */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .title-group h1 {
+      font-size: 1.75rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      background: linear-gradient(90deg, #fff, #94a3b8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .title-group p {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      margin-top: 0.25rem;
+    }
+
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+    }
+
+    .stat-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      padding: 1.25rem;
+      border-radius: var(--radius);
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    .stat-label {
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-weight: 600;
+    }
+
+    .stat-value {
+      font-size: 1.85rem;
+      font-weight: 800;
+      color: var(--text-main);
+      display: flex;
+      align-items: baseline;
+      gap: 0.4rem;
+    }
+
+    .stat-value span {
+      font-size: 0.9rem;
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    /* Layout Principal */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: 1.6fr 1fr;
+      gap: 1.5rem;
+      align-items: start;
+    }
+
+    @media (max-width: 820px) {
+      .dashboard-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.25rem;
+    }
+
+    .card-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+    }
+
+    /* Formulario de Nuevo Hábito */
+    .add-habit-form {
+      display: flex;
+      gap: 0.6rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .input-text {
+      flex: 1;
+      background: var(--bg-main);
+      border: 1px solid var(--border);
+      color: var(--text-main);
+      padding: 0.75rem 1rem;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .input-text:focus {
+      border-color: var(--accent-secondary);
+    }
+
+    .btn-primary {
+      background: var(--accent-secondary);
+      color: white;
+      border: none;
+      padding: 0.75rem 1.2rem;
+      border-radius: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.1s;
+    }
+
+    .btn-primary:hover {
+      opacity: 0.92;
+    }
+
+    .btn-primary:active {
+      transform: scale(0.98);
+    }
+
+    /* Tabla de Hábitos */
+    .habit-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .habit-header-days {
+      display: grid;
+      grid-template-columns: 1fr repeat(7, 34px) 55px 28px;
+      gap: 0.4rem;
+      padding: 0 0.75rem 0.5rem;
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-align: center;
+    }
+
+    .habit-header-days div:first-child {
+      text-align: left;
+    }
+
+    .habit-row {
+      display: grid;
+      grid-template-columns: 1fr repeat(7, 34px) 55px 28px;
+      gap: 0.4rem;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--border);
+      padding: 0.75rem;
+      border-radius: 12px;
+      transition: background 0.2s;
+    }
+
+    .habit-row:hover {
+      background: var(--bg-card-hover);
+    }
+
+    .habit-info {
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      padding-right: 0.5rem;
+    }
+
+    .habit-name {
+      font-weight: 600;
+      font-size: 0.92rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .habit-cat {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+    }
+
+    .day-check {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      border: 1.5px solid var(--border);
+      background: var(--bg-main);
+      color: transparent;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      font-weight: bold;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      margin: 0 auto;
+    }
+
+    .day-check:hover {
+      border-color: var(--accent);
+    }
+
+    .day-check.completed {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #052e16;
+      box-shadow: 0 0 12px var(--accent-glow);
+    }
+
+    .streak-badge {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.2rem;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #fbbf24;
+      background: rgba(251, 191, 36, 0.1);
+      padding: 0.3rem 0.4rem;
+      border-radius: 8px;
+    }
+
+    .btn-delete {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0.5;
+      transition: opacity 0.2s, color 0.2s;
+    }
+
+    .btn-delete:hover {
+      opacity: 1;
+      color: var(--danger);
+    }
+
+    /* Gráfico Semanal de Barras */
+    .chart-container {
+      margin-top: 1.5rem;
+      height: 210px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 0.75rem;
+      padding: 1.5rem 0.5rem 0.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .chart-col {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      height: 100%;
+      justify-content: flex-end;
+      gap: 0.5rem;
+    }
+
+    .bar-wrapper {
+      width: 100%;
+      max-width: 36px;
+      height: 140px;
+      background: var(--bg-main);
+      border-radius: 8px;
+      display: flex;
+      align-items: flex-end;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+
+    .bar-fill {
+      width: 100%;
+      background: linear-gradient(180deg, var(--accent), #059669);
+      border-radius: 6px 6px 0 0;
+      transition: height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .bar-pct {
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--text-muted);
+    }
+
+    .bar-label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    .bar-label.is-today {
+      color: var(--accent);
+      font-weight: 800;
+    }
+
+    /* Resumen por hábito en el panel lateral */
+    .streak-ranking {
+      margin-top: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .ranking-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.85rem;
+      padding: 0.6rem 0.85rem;
+      background: var(--bg-main);
+      border-radius: 10px;
+      border: 1px solid var(--border);
+    }
+  </style>
+</head>
+<body>
+  <div id="app"></div>
+
+  <!-- Preact + Hooks + HTM vía CDN -->
+  <script type="module">
+    import { h, render } from 'https://esm.sh/preact@10.19.3';
+    import { useState, useEffect, useMemo } from 'https://esm.sh/preact@10.19.3/hooks';
+    import htm from 'https://esm.sh/htm@3.1.1';
+
+    const html = htm.bind(h);
+
+    const DAYS_LABELS = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
+
+    const DEFAULT_HABITS = [
+      { id: 1, name: 'Meta nutricional (3000 kcal)', category: 'Salud & Físico', days: [true, true, true, false, false, false, false] },
+      { id: 2, name: 'Estudio casos clínicos (2h)', category: 'Facultad', days: [true, true, true, false, false, false, false] },
+      { id: 3, name: 'Entrenamiento de fuerza', category: 'Salud & Físico', days: [true, false, true, false, false, false, false] },
+      { id: 4, name: 'Desarrollo Web / Código (1h)', category: 'Proyectos', days: [false, true, true, false, false, false, false] }
+    ];
+
+    function App() {
+      const [habits, setHabits] = useState(() => {
+        const saved = localStorage.getItem('habit_flow_data_v1');
+        return saved ? JSON.parse(saved) : DEFAULT_HABITS;
+      });
+      const [newHabitName, setNewHabitName] = useState('');
+      const [newHabitCat, setNewHabitCat] = useState('General');
+
+      useEffect(() => {
+        localStorage.setItem('habit_flow_data_v1', JSON.stringify(habits));
+      }, [habits]);
+
+      // Índice del día actual (0 = Lunes ... 6 = Domingo)
+      const todayIndex = useMemo(() => {
+        const day = new Date().getDay();
+        return day === 0 ? 6 : day - 1;
+      }, []);
+
+      const toggleDay = (habitId, dayIdx) => {
+        setHabits(prev => prev.map(habit => {
+          if (habit.id !== habitId) return habit;
+          const updatedDays = [...habit.days];
+          updatedDays[dayIdx] = !updatedDays[dayIdx];
+          return { ...habit, days: updatedDays };
+        }));
+      };
+
+      const addHabit = (e) => {
+        e.preventDefault();
+        if (!newHabitName.trim()) return;
+        const nuevo = {
+          id: Date.now(),
+          name: newHabitName.trim(),
+          category: newHabitCat,
+          days: [false, false, false, false, false, false, false]
+        };
+        setHabits([...habits, nuevo]);
+        setNewHabitName('');
+      };
+
+      const deleteHabit = (id) => {
+        setHabits(habits.filter(h => h.id !== id));
+      };
+
+      // Calcula la racha activa o máxima dentro de la semana para un hábito
+      const calculateStreak = (daysArray) => {
+        let current = 0;
+        let max = 0;
+        for (let completed of daysArray) {
+          if (completed) {
+            current++;
+            if (current > max) max = current;
+          } else {
+            current = 0;
+          }
+        }
+        return max;
+      };
+
+      // Estadísticas globales
+      const stats = useMemo(() => {
+        const totalPossible = habits.length * 7;
+        const totalCompleted = habits.reduce((acc, h) => acc + h.days.filter(Boolean).length, 0);
+        const weeklyRate = totalPossible > 0 ? Math.round((totalCompleted / totalPossible) * 100) : 0;
+
+        const completedToday = habits.filter(h => h.days[todayIndex]).length;
+        const bestStreak = habits.reduce((max, h) => Math.max(max, calculateStreak(h.days)), 0);
+
+        const dailyPercentages = DAYS_LABELS.map((_, idx) => {
+          if (habits.length === 0) return 0;
+          const doneThatDay = habits.filter(h => h.days[idx]).length;
+          return Math.round((doneThatDay / habits.length) * 100);
+        });
+
+        return { weeklyRate, completedToday, bestStreak, dailyPercentages };
+      }, [habits, todayIndex]);
+
+      return html`
+        <div class="container">
+          <header>
+            <div class="title-group">
+              <h1>Panel de Hábitos & Rachas</h1>
+              <p>Seguimiento diario de objetivos y consistencia semanal</p>
+            </div>
+          </header>
+
+          <!-- Tarjetas de Resumen -->
+          <div class="stats-row">
+            <div class="stat-card">
+              <span class="stat-label">Progreso de Hoy (${DAYS_LABELS[todayIndex]})</span>
+              <div class="stat-value">
+                ${stats.completedToday} / ${habits.length}
+                <span>metas</span>
+              </div>
+            </div>
+
+            <div class="stat-card">
+              <span class="stat-label">Efectividad Semanal</span>
+              <div class="stat-value">
+                ${stats.weeklyRate}%
+                <span>completado</span>
+              </div>
+            </div>
+
+            <div class="stat-card">
+              <span class="stat-label">Mejor Racha Semanal</span>
+              <div class="stat-value">
+                🔥 ${stats.bestStreak}
+                <span>días seguidos</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="dashboard-grid">
+            <!-- Columna Izquierda: Registro de Hábitos -->
+            <div class="card">
+              <div class="card-header">
+                <h2 class="card-title">Metas Diarias</h2>
+              </div>
+
+              <form class="add-habit-form" onSubmit=${addHabit}>
+                <input
+                  type="text"
+                  class="input-text"
+                  placeholder="Nueva meta diaria (ej. Repasar semiología)..."
+                  value=${newHabitName}
+                  onInput=${(e) => setNewHabitName(e.target.value)}
+                />
+                <select
+                  class="input-text"
+                  style="max-width: 145px;"
+                  value=${newHabitCat}
+                  onChange=${(e) => setNewHabitCat(e.target.value)}
+                >
+                  <option value="Facultad">Facultad</option>
+                  <option value="Salud & Físico">Salud & Físico</option>
+                  <option value="Proyectos">Proyectos</option>
+                  <option value="General">General</option>
+                </select>
+                <button type="submit" class="btn-primary">+ Añadir</button>
+              </form>
+
+              <div class="habit-header-days">
+                <div>Hábito</div>
+                ${DAYS_LABELS.map((d, i) => html`
+                  <div style=${i === todayIndex ? 'color: var(--accent); font-weight:800;' : ''}>${d}</div>
+                `)}
+                <div>Racha</div>
+                <div></div>
+              </div>
+
+              <div class="habit-list">
+                ${habits.map(habit => {
+                  const streak = calculateStreak(habit.days);
+                  return html`
+                    <div class="habit-row" key=${habit.id}>
+                      <div class="habit-info">
+                        <span class="habit-name">${habit.name}</span>
+                        <span class="habit-cat">${habit.category}</span>
+                      </div>
+
+                      ${habit.days.map((done, dIdx) => html`
+                        <button
+                          class="day-check ${done ? 'completed' : ''}"
+                          onClick=${() => toggleDay(habit.id, dIdx)}
+                          title="Marcar ${DAYS_LABELS[dIdx]}"
+                        >
+                          ✓
+                        </button>
+                      `)}
+
+                      <div class="streak-badge" title="Mejor racha en la semana">
+                        🔥 ${streak}d
+                      </div>
+
+                      <button class="btn-delete" onClick=${() => deleteHabit(habit.id)} title="Eliminar hábito">
+                        ✕
+                      </button>
+                    </div>
+                  `;
+                })}
+              </div>
+            </div>
+
+            <!-- Columna Derecha: Gráfico de Rendimiento y Rachas -->
+            <div class="card">
+              <div class="card-header">
+                <h2 class="card-title">Consistencia Semanal</h2>
+              </div>
+              <p style="color: var(--text-muted); font-size: 0.85rem;">
+                Porcentaje de metas completadas por día de la semana.
+              </p>
+
+              <div class="chart-container">
+                ${stats.dailyPercentages.map((pct, idx) => html`
+                  <div class="chart-col">
+                    <span class="bar-pct">${pct}%</span>
+                    <div class="bar-wrapper">
+                      <div class="bar-fill" style="height: ${pct}%;"></div>
+                    </div>
+                    <span class="bar-label ${idx === todayIndex ? 'is-today' : ''}">
+                      ${DAYS_LABELS[idx]}
+                    </span>
+                  </div>
+                `)}
+              </div>
+
+              <div class="streak-ranking">
+                <span class="stat-label" style="margin-top: 0.5rem;">Desglose de Rachas Activas</span>
+                ${habits.map(h => {
+                  const totalDone = h.days.filter(Boolean).length;
+                  return html`
+                    <div class="ranking-item">
+                      <span>${h.name}</span>
+                      <span style="font-weight: 700; color: var(--accent);">
+                        ${totalDone}/7 días
+                      </span>
+                    </div>
+                  `;
+                })}
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    render(html`<${App} />`, document.getElementById('app'));
+  </script>
+</body>
+</html>

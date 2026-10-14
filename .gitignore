@@ -1,0 +1,7 @@
+# Sistema operativo y archivos temporales
+.DS_Store
+Thumbs.db
+*.tmp
+*.log
+.vscode/
+.idea/
